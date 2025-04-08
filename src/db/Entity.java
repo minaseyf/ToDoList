@@ -1,4 +1,9 @@
 package db;
 
-public class Entity {
+import java.util.Date;
+
+public abstract class Entity {
+    public int id;
+    public abstract Entity copy();
+    public abstract int getEntityCode();
 }
