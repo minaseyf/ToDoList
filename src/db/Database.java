@@ -18,9 +18,17 @@ public class Database {
 
     public static void add(Entity e) throws InvalidEntityException {
         Validator validator = validators.get(e.getEntityCode());
-        validator.validate(e);
-        e.id = ID;
-        entities.add(e.copy());
+        if(e instanceof Trackable){
+            e.id = ID;
+            ((Trackable) e).setLastModificationDate(new Date());
+            ((Trackable) e).setCreationDate(new Date());
+            entities.add(e.copy());
+        }
+        else{
+            validator.validate(e);
+            e.id = ID;
+            entities.add(e.copy());
+        }
         ID++;
     }
 
@@ -44,6 +52,25 @@ public class Database {
 
     public static void update(Entity e) throws InvalidEntityException {
         Validator validator = validators.get(e.getEntityCode());
+        int found = 0;
+        int temp = -1;
+        for(int i = 0; i < entities.size(); i++) {
+            if(entities.get(i).id == e.id) {
+                found = 1;
+                temp = i;
+            }
+        }
+        if(found == 0) {
+            throw new EntityNotFoundException();
+        }
+        if(e instanceof Trackable) {
+            ((Trackable) e).setLastModificationDate(new Date());
+            entities.set(temp, e.copy());
+        }
+        else {
+            validator.validate(e);
+            entities.set(temp, e.copy());
+        }
     }
 
     public static void registerValidator(int entityCode, Validator validator) {
@@ -51,5 +78,14 @@ public class Database {
             throw new IllegalArgumentException("The entityCode or the validator already exists!");
 
         validators.put(entityCode, validator);
+    }
+
+    public static ArrayList<Entity> getAll(int entityCode) {
+        ArrayList<Entity> entityList = new ArrayList<>();
+        for (Entity e : entities) {
+            if (e.getEntityCode() == entityCode)
+                entityList.add(e);
+        }
+        return entityList;
     }
 }
