@@ -17,8 +17,9 @@ public class StepService {
         Database.update(s);
     }
 
-    public static void saveStep(int taskRef, String title) throws InvalidEntityException {
+    public static int saveStep(int taskRef, String title) throws InvalidEntityException {
         Step step = new Step(title, taskRef);
         Database.add(step);
+        return step.id;
     }
 }
