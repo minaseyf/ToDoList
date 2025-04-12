@@ -39,6 +39,8 @@ public class Main {
             }
             scanner.close();
         }
+        Database.registerValidator(Task.Task_ENTITY_CODE, new TaskValidator());
+        Database.registerValidator(Step.Step_ENTITY_CODE, new StepValidator());
     }
     public static void addTask() {
         try {
