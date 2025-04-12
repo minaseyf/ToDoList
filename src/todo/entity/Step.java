@@ -1,6 +1,9 @@
 package todo.entity;
 
 import db.Entity;
+import db.Trackable;
+
+import java.util.Date;
 
 public class Step extends Entity {
     @Override
