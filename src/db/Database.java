@@ -50,26 +50,24 @@ public class Database {
         throw new EntityNotFoundException();
     }
 
-    public static void update(Entity e) throws InvalidEntityException {
+    public static void update(Entity e) throws EntityNotFoundException, InvalidEntityException {
         Validator validator = validators.get(e.getEntityCode());
+        if (validator != null) {
+            validator.validate(e);
+        }
+        if (e instanceof Trackable) {
+            ((Trackable) e).setLastModificationDate(new Date());
+        }
         int found = 0;
-        int temp = -1;
-        for(int i = 0; i < entities.size(); i++) {
-            if(entities.get(i).id == e.id) {
+        for (int i = 0; i < entities.size(); i++) {
+            if (entities.get(i).id == e.id) {
+                entities.set(i, e.copy());
                 found = 1;
-                temp = i;
+                break;
             }
         }
-        if(found == 0) {
-            throw new EntityNotFoundException();
-        }
-        if(e instanceof Trackable) {
-            ((Trackable) e).setLastModificationDate(new Date());
-            entities.set(temp, e.copy());
-        }
-        else {
-            validator.validate(e);
-            entities.set(temp, e.copy());
+        if (found == 0) {
+            throw new EntityNotFoundException(e.id);
         }
     }
 
