@@ -18,21 +18,22 @@ public class Main {
     static Scanner scanner = new Scanner(System.in);
     public static void main(String[] args) throws InvalidEntityException {
         String firstInput = scanner.nextLine();
-        if(firstInput != "exit") {
+        if(!firstInput.equals("exit")) {
             String input = "";
-            while (input != "exit") {
+            while (!input.equals("exit")) {
                 input = scanner.nextLine();
-                if(input == "add task")
+                if(input.equals("add task"))
                     addTask();
-                if(input == "add step")
+                if(input.equals("add step"))
                     addStep();
-                if(input == "delete")
+                if(input.equals("delete"))
                     delete();
-                if(input == "get all-tasks")
+                if(input.equals("get all-tasks"))
                     getAllTasks();
-                if(input == "get incomplete-tasks")
+                if(input.equals("get incomplete-tasks"))
                     getIncompleteTasks();
             }
+            scanner.close();
         }
     }
     public static void addTask() {
@@ -61,12 +62,15 @@ public class Main {
     }
 
     public static Date stringToDate(String date) {
+        if (date == null || date.isEmpty()) {
+            throw new IllegalArgumentException("Date cannot be null or empty!");
+        }
         try {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            dateFormat.setLenient(false);
+            dateFormat.setLenient(false); // Ensures strict date parsing
             return dateFormat.parse(date);
         } catch (ParseException e) {
-            throw new IllegalArgumentException("Invalid date format! (correct format: yyyy-MM-dd)");
+            throw new IllegalArgumentException("Invalid date format! Expected format: yyyy-MM-dd");
         }
     }
 
