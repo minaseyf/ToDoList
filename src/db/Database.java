@@ -17,18 +17,21 @@ public class Database {
     }
 
     public static void add(Entity e) throws InvalidEntityException {
-        Validator validator = validators.get(e.getEntityCode());
-        if(e instanceof Trackable){
-            e.id = ID;
+        e.id = ID;
+
+        if (e instanceof Trackable) {
             ((Trackable) e).setLastModificationDate(new Date());
             ((Trackable) e).setCreationDate(new Date());
             entities.add(e.copy());
-        }
-        else{
+        } else {
+            Validator validator = validators.get(e.getEntityCode());
+            if (validator == null) {
+                throw new InvalidEntityException("No validator found for entity code: " + e.getEntityCode());
+            }
             validator.validate(e);
-            e.id = ID;
             entities.add(e.copy());
         }
+
         ID++;
     }
 
