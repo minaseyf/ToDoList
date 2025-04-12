@@ -1,10 +1,12 @@
 import db.Database;
 import db.Entity;
+import db.Validator;
 import db.exception.EntityNotFoundException;
 import db.exception.InvalidEntityException;
 import todo.entity.Step;
 import todo.entity.Task;
 import todo.service.StepService;
+import todo.validator.StepValidator;
 import todo.validator.TaskValidator;
 
 import java.text.ParseException;
@@ -20,6 +22,8 @@ public class Main {
         String firstInput = scanner.nextLine();
         if(!firstInput.equals("exit")) {
             String input = "";
+            Database.registerValidator(Task.Task_ENTITY_CODE, new TaskValidator());
+            Database.registerValidator(Step.Step_ENTITY_CODE, new StepValidator());
             while (!input.equals("exit")) {
                 input = scanner.nextLine();
                 if(input.equals("add task"))
@@ -67,7 +71,7 @@ public class Main {
         }
         try {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            dateFormat.setLenient(false); // Ensures strict date parsing
+            dateFormat.setLenient(false);
             return dateFormat.parse(date);
         } catch (ParseException e) {
             throw new IllegalArgumentException("Invalid date format! Expected format: yyyy-MM-dd");
@@ -77,12 +81,15 @@ public class Main {
     public static void addStep() {
         try {
             System.out.print("TaskID: ");
-            int taskID = scanner.nextInt();
+            int taskID = Integer.parseInt(scanner.nextLine());
             System.out.print("Title: ");
             String title = scanner.nextLine();
 
             int stepID = StepService.saveStep(taskID, title);
             Step step = (Step) Database.get(stepID);
+            StepValidator stepValidator = new StepValidator();
+            stepValidator.validate(step);
+
             System.out.println("Step saved successfully.");
             System.out.println("ID: " + stepID);
             System.out.println("Creation Date: " + step.creationDate);
@@ -90,8 +97,8 @@ public class Main {
             System.out.println("Cannot save step.");
             System.out.println("Error: " + e.getMessage());
         } catch (NumberFormatException e) {
-        System.out.println("Cannot save step.");
-        System.out.println("Error: Invalid format.");
+            System.out.println("Cannot save step.");
+            System.out.println("Error: Invalid format.");
         } catch (EntityNotFoundException e) {
             System.out.println("Cannot save step.");
             System.out.println("Error: Cannot find task with ID=" + e.getMessage().split("=")[1]);
@@ -133,7 +140,7 @@ public class Main {
             ArrayList<Entity> allSteps = Database.getAll(Step.Step_ENTITY_CODE);
             System.out.println("Steps: ");
             for (Entity s : allSteps) {
-                if (((Step) s).taskRef == s.id) {
+                if (((Step) s).taskRef == e.id) {
                     System.out.println("    + " + ((Step) s).title + ":");
                     System.out.println("      ID: " + s.id);
                     System.out.println("      Status: " + ((Step) s).status);
@@ -154,7 +161,7 @@ public class Main {
                 ArrayList<Entity> allSteps = Database.getAll(Step.Step_ENTITY_CODE);
                 System.out.println("Steps: ");
                 for (Entity s : allSteps) {
-                    if (((Step) s).taskRef == s.id) {
+                    if (((Step) s).taskRef == e.id) {
                         System.out.println("    + " + ((Step) s).title + ":");
                         System.out.println("      ID: " + s.id);
                         System.out.println("      Status: " + ((Step) s).status);
