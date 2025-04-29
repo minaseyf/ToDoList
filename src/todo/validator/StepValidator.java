@@ -11,13 +11,13 @@ public class StepValidator implements Validator {
     @Override
     public void validate(Entity entity) throws InvalidEntityException {
         if(!(entity instanceof Step))
-            throw new IllegalArgumentException("Invalid type of input!");
+            throw new IllegalArgumentException("Invalid type of entity!");
 
         if (((Step) entity).title == null || ((Step) entity).title.isEmpty())
             throw new InvalidEntityException("Title can not be null or empty!");
 
         int found = 0;
-        for(Entity e : Database.entities) {
+        for(Entity e : Database.getAll(Task.Task_ENTITY_CODE)) {
             if (e.id == ((Step) entity).taskRef) {
                 found = 1;
                 break;

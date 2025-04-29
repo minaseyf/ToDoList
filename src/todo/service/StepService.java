@@ -2,9 +2,11 @@ package todo.service;
 
 import db.Database;
 import db.Entity;
+import db.exception.EntityNotFoundException;
 import db.exception.InvalidEntityException;
 import todo.entity.Step;
 import todo.entity.Task;
+import todo.validator.StepValidator;
 
 public class StepService {
     public static void setAsCompleted(int stepId) throws InvalidEntityException {
