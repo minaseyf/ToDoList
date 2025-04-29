@@ -9,7 +9,7 @@ import example.*;
 import db.exception.*;
 
 public class Database {
-    public static ArrayList<Entity> entities = new ArrayList<>();
+    private static ArrayList<Entity> entities = new ArrayList<>();
     private static int ID = 1;
     private static HashMap<Integer, Validator> validators = new HashMap<>();
 
@@ -18,19 +18,17 @@ public class Database {
 
     public static void add(Entity e) throws InvalidEntityException {
         e.id = ID;
-
+        Validator validator = validators.get(e.getEntityCode());
         if (e instanceof Trackable) {
             ((Trackable) e).setLastModificationDate(new Date());
             ((Trackable) e).setCreationDate(new Date());
-            entities.add(e.copy());
-        } else {
-            Validator validator = validators.get(e.getEntityCode());
-            if (validator == null) {
-                throw new InvalidEntityException("No validator found for entity code: " + e.getEntityCode());
-            }
-            validator.validate(e);
-            entities.add(e.copy());
         }
+
+        if (validator != null) {
+            validator.validate(e);
+        }
+
+        entities.add(e.copy());
 
         ID++;
     }
